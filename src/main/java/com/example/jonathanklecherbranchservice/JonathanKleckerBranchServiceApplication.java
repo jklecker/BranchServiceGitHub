@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @see com.example.jonathanklecherbranchservice.service.GitHubService
  */
 @SpringBootApplication
+@SuppressWarnings("PMD.UseUtilityClass")
 public class JonathanKleckerBranchServiceApplication {
 
     /**

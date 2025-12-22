@@ -3,6 +3,13 @@ package com.example.jonathanklecherbranchservice.controller;
 import com.example.jonathanklecherbranchservice.entity.GitHubInfo;
 import com.example.jonathanklecherbranchservice.service.GitHubService;
 import com.example.jonathanklecherbranchservice.service.GitHubServiceException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RestController
 @RequestMapping("/users")
+@Tag(name = "GitHub Users", description = "API for retrieving GitHub user profile information and repositories")
 public class GitInfoController {
 
     private static final String ERROR = "error";
@@ -53,7 +61,40 @@ public class GitInfoController {
      *         or error message if invalid username (400 Bad Request)
      */
     @GetMapping("/{userName}")
-    public ResponseEntity<?> getGitInfo(@PathVariable final String userName) {
+    @Operation(
+        summary = "Get GitHub user profile and repositories",
+        description = "Retrieves complete GitHub user profile information including repositories. " +
+                      "Validates username format and returns cached data if GitHub API is unavailable."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "User found successfully with profile and repositories",
+            content = @Content(schema = @Schema(implementation = GitHubInfo.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid GitHub username format. Username must be 1-39 characters, " +
+                         "alphanumeric + hyphens, no leading/trailing hyphens, no consecutive hyphens"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found on GitHub. Returns cached data if available."
+        ),
+        @ApiResponse(
+            responseCode = "503",
+            description = "GitHub API service unavailable. Returns cached data if available."
+        )
+    })
+    public ResponseEntity<?> getGitInfo(
+        @Parameter(
+            name = "userName",
+            description = "GitHub username (login). Must be 1-39 characters, alphanumeric + hyphens. " +
+                         "Examples: 'octocat', 'john-doe', 'user123'",
+            required = true,
+            example = "octocat"
+        )
+        @PathVariable final String userName) {
         final ResponseEntity<?> result;
         if (isValidGitHubUserName(userName)) {
             result = processValidUserName(userName);
@@ -69,6 +110,7 @@ public class GitInfoController {
      * Processes a valid GitHub username by fetching user data from the service.
      * <p>
      * Handles both successful API calls and exceptions:
+
      * - Success: Caches the data and returns 200 OK
      * - NOT_FOUND (404): Returns cached data if available, otherwise returns 404 error
      * - Other errors: Returns cached data if available with error message and appropriate status

@@ -17,6 +17,19 @@
 curl http://localhost:8080/users/octocat | jq .
 ```
 
+**Or run the application using the Gradle sidebar in your IDE (e.g., IntelliJ IDEA):**
+
+1. Open the project in your IDE (such as IntelliJ IDEA).
+2. Locate the **Gradle** tool window (usually on the right or left sidebar).
+3. Expand the project tree under `Tasks > application` or `Tasks > bootRun`.
+4. Double-click **bootRun** to start the application.
+5. Watch the console output for startup logs and access the API at `http://localhost:8080`.
+
+**Or access the interactive Swagger UI for testing:**
+```
+http://localhost:8080/swagger-ui.html
+```
+
 ---
 
 ## 📋 Table of Contents
@@ -28,6 +41,7 @@ curl http://localhost:8080/users/octocat | jq .
 - [Installation & Setup](#-installation--setup)
 - [Running the Service](#-running-the-service)
 - [API Documentation](#-api-documentation)
+- [Interactive API Documentation (Swagger/OpenAPI)](#-interactive-api-documentation-swaggeropenapi)
 - [Code Quality](#-code-quality)
 - [Testing](#-testing)
 - [Project Structure](#-project-structure)
@@ -328,6 +342,102 @@ curl http://localhost:8080/users/-invalid
 # Test non-existent user
 curl http://localhost:8080/users/invalid_user_that_does_not_exist_12345
 ```
+
+## 📚 Interactive API Documentation (Swagger/OpenAPI)
+
+### Quick Start with Swagger UI
+
+The project includes **Springdoc OpenAPI** which automatically generates interactive API documentation:
+
+**Access Swagger UI:**
+```
+http://localhost:8080/swagger-ui.html
+```
+
+**Access OpenAPI JSON Specification:**
+```
+http://localhost:8080/v3/api-docs
+```
+
+**Access OpenAPI YAML Specification:**
+```
+http://localhost:8080/v3/api-docs.yaml
+```
+
+### Features
+
+✅ **Interactive Endpoint Testing**
+- Click "Try it out" button on any endpoint
+- Enter parameters directly in the UI
+- See live responses in real-time
+- No need for curl or Postman
+
+✅ **Complete Schema Documentation**
+- Request/response models documented
+- Field descriptions with examples
+- Data types and validation rules
+- Required vs optional fields
+
+✅ **HTTP Status Codes**
+- All possible responses documented
+- Error messages with descriptions
+- Real-world response examples
+
+### Using Swagger UI
+
+**Step-by-Step:**
+1. Start the application: `./gradlew bootRun`
+2. Open browser: `http://localhost:8080/swagger-ui.html`
+3. Expand "GitHub Users" section
+4. Click on "GET /users/{userName}"
+5. Click "Try it out"
+6. Enter username: `octocat`
+7. Click "Execute"
+8. See the response immediately
+
+### Swagger UI Features
+
+| Feature | Description |
+|---------|-------------|
+| **Try it out** | Test endpoints directly from documentation |
+| **Server Selection** | Switch between local and production servers |
+| **Request/Response Examples** | See real-world data structures |
+| **Schema Definitions** | Browse all data models |
+| **HTTP Status Codes** | Understand all possible responses |
+| **cURL Command** | Copy pre-formatted curl commands |
+
+### API Models in Swagger
+
+**GitHubInfo Model:**
+```json
+{
+  "userName": "octocat",
+  "displayName": "The Octocat",
+  "avatar": "https://github.com/images/error/octocat_happy.gif",
+  "geoLocation": "San Francisco",
+  "email": "octocat@github.com",
+  "url": "https://api.github.com/users/octocat",
+  "createdAt": "Tue, 25 Jan 2011 18:44:36 GMT",
+  "repositories": [...]
+}
+```
+
+**GitHubRepository Model:**
+```json
+{
+  "name": "Hello-World",
+  "url": "https://api.github.com/repos/octocat/Hello-World"
+}
+```
+
+### Benefits of Swagger Integration
+
+🎨 **Beautiful Documentation** - Professional, interactive UI
+📖 **Auto-Generated** - Keeps docs in sync with code
+🔍 **Discoverable** - Easy to explore API capabilities
+🧪 **Testable** - Test endpoints directly in docs
+👥 **Developer-Friendly** - Lower barrier to integration
+📱 **Mobile-Responsive** - Works on all devices
 
 ## 🧪 Testing
 
