@@ -1,0 +1,86 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.spotbugs' version '6.0.8'
+	id 'pmd'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+	testImplementation 'org.mockito:mockito-inline:5.2.0'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// SpotBugs dependencies for bug detection
+	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	// Configure Mockito Java agent to avoid dynamic attachment warning
+	jvmArgs = ["-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('byte-buddy-agent') }.absolutePath}"]
+}
+
+// SpotBugs Configuration
+spotbugs {
+	// Set effort level: min, default, or max
+	effort = 'max'
+	// Set report level: high, medium, or low (high = only important bugs)
+	reportLevel = 'medium'
+}
+
+
+// PMD Configuration
+pmd {
+	// Set ruleset - can be built-in or custom
+	ruleSetConfig = resources.text.fromFile('config/pmd-ruleset.xml')
+	ignoreFailures = false
+}
+
+
+// Run all analyses on main and test code
+tasks.register('codeQuality') {
+	dependsOn spotbugsMain, pmdMain
+	doLast {
+		println "✓ SpotBugs analysis complete - Main Code:"
+		println "  HTML: build/reports/spotbugs/main.html"
+		println "  XML:  build/reports/spotbugs/main.xml"
+		println "✓ PMD analysis complete - Main Code:"
+		println "  HTML: build/reports/pmd/main.html"
+		println "  XML:  build/reports/pmd/main.xml"
+	}
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(Test).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

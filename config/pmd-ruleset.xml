@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<ruleset name="JonathanKleckerBranchService PMD Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+        PMD ruleset for JonathanKleckerBranchService project.
+        Checks for code quality issues, potential bugs, and best practices.
+    </description>
+
+    <!-- Best Practices -->
+    <rule ref="category/java/bestpractices.xml">
+        <!-- Exclude specific rules if needed -->
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
+        <!-- DataClass: Entity/model classes are supposed to be data classes -->
+        <exclude name="DataClass"/>
+        <exclude name="UnusedPrivateField"/>
+        <!-- DuplicateStringLiteral: In test files, data reuse is intentional;
+             test data like "john", "John Doe" etc. are deliberately repeated for clarity -->
+        <exclude name="DuplicateStringLiteral"/>
+        <!-- Tests without explicit assertions: Integration tests with MockMvc or Spring context
+             have implicit assertions. Examples:
+             1. Spring Boot context test: test passing IS the assertion (if context fails to load, test fails)
+             2. MockMvc test: mockMvc.perform().andExpect(status().isOk()) throws AssertionError if status is wrong
+             This is standard Spring Boot practice and PMD's strict rule doesn't apply. -->
+        <exclude name="AssertionInTest"/>
+    </rule>
+
+    <!-- Code Style -->
+    <rule ref="category/java/codestyle.xml">
+        <!-- Only check line length up to 120 characters -->
+        <property name="classNamingConventions@classPattern" value="[A-Z][a-zA-Z0-9]*"/>
+        <!-- Allow common abbreviations -->
+        <exclude name="ShortMethodName"/>
+        <!-- AtLeastOneConstructor: Conflicts with AvoidUnnecessaryConstructors;
+             compiler generates default constructors automatically -->
+        <exclude name="AtLeastOneConstructor"/>
+        <!-- OnlyOneReturn: Methods with clear branching are acceptable and readable -->
+        <exclude name="OnlyOneReturn"/>
+        <!-- UnnecessaryAssertionInTest: In integration tests, test passing IS the assertion;
+             e.g., "assertTrue(true)" after MockMvc.perform().andExpect(status().isOk()) is redundant -->
+        <exclude name="UnnecessaryAssertionInTest"/>
+    </rule>
+
+    <!-- Design Issues -->
+    <rule ref="category/java/design.xml">
+        <!-- Moderate complexity threshold -->
+        <property name="cyclomatic@reportLevel" value="10"/>
+        <!-- TooManyMethods: @Nested test classes are a JUnit 5 best practice for organizing tests.
+             When using @Nested, logical method count is distributed across inner classes -->
+        <exclude name="TooManyMethods"/>
+    </rule>
+
+    <!-- Error Prone -->
+    <rule ref="category/java/errorprone.xml">
+        <!-- Check for common mistakes -->
+    </rule>
+
+    <!-- Performance -->
+    <rule ref="category/java/performance.xml">
+        <!-- Check for performance anti-patterns -->
+    </rule>
+
+    <!-- Security -->
+    <rule ref="category/java/security.xml">
+        <!-- Check for security vulnerabilities -->
+    </rule>
+
+</ruleset>
+
