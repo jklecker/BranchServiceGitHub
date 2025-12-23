@@ -1,5 +1,7 @@
 # Jonathan Klecker Branch Service
 
+**Repository**: https://github.com/jklecker/BranchServiceGitHub/tree/main
+
 ---
 
 ## 🚦 Quick Start
@@ -30,6 +32,8 @@ curl http://localhost:8080/users/octocat | jq .
 http://localhost:8080/swagger-ui.html
 ```
 
+**See [API Documentation](#-api-documentation) for complete endpoint details and examples.**
+
 ---
 
 ## 📋 Table of Contents
@@ -42,25 +46,24 @@ http://localhost:8080/swagger-ui.html
 - [Running the Service](#-running-the-service)
 - [API Documentation](#-api-documentation)
 - [Interactive API Documentation (Swagger/OpenAPI)](#-interactive-api-documentation-swaggeropenapi)
-- [Code Quality](#-code-quality)
 - [Testing](#-testing)
-- [Project Structure](#-project-structure)
+- [Code Quality](#-code-quality)
+- [Development Workflow](#-development-workflow)
+- [Configuration](#-configuration)
 - [Troubleshooting](#-troubleshooting)
 
 ## 🎯 Overview
 
-The Jonathan Klecker Branch Service is a Spring Boot REST API that integrates with the GitHub API to retrieve:
-- GitHub user profile information (name, avatar, location, email, etc.)
-- User's public repositories (name and URLs)
-- Properly formatted creation dates
+A Spring Boot REST API that pulls GitHub user data and their repos. Give it a username, and it returns:
+- User profile info (name, avatar, location, email, etc.)
+- Their public repositories (name and URL)
+- Formatted creation dates
 
-The service includes intelligent caching, comprehensive error handling, and extensive validation to ensure reliability and user-friendly responses.
+Built with caching for better performance, solid error handling, and username validation to catch issues early.
 
 ## 🏗️ Architecture
 
-### Layered Architecture
-
-The application follows a clean, layered architecture pattern:
+Standard layered architecture - nothing fancy, just clean separation:
 
 ```
 ┌─────────────────────────────────────┐
@@ -81,7 +84,7 @@ The application follows a clean, layered architecture pattern:
 └─────────────────────────────────────┘
 ```
 
-### Component Breakdown
+### What Each Part Does
 
 | Component | Responsibility |
 |-----------|-----------------|
@@ -347,7 +350,7 @@ curl http://localhost:8080/users/invalid_user_that_does_not_exist_12345
 
 ### Quick Start with Swagger UI
 
-The project includes **Springdoc OpenAPI** which automatically generates interactive API documentation:
+Built-in Swagger UI for testing endpoints without curl:
 
 **Access Swagger UI:**
 ```
@@ -395,49 +398,6 @@ http://localhost:8080/v3/api-docs.yaml
 7. Click "Execute"
 8. See the response immediately
 
-### Swagger UI Features
-
-| Feature | Description |
-|---------|-------------|
-| **Try it out** | Test endpoints directly from documentation |
-| **Server Selection** | Switch between local and production servers |
-| **Request/Response Examples** | See real-world data structures |
-| **Schema Definitions** | Browse all data models |
-| **HTTP Status Codes** | Understand all possible responses |
-| **cURL Command** | Copy pre-formatted curl commands |
-
-### API Models in Swagger
-
-**GitHubInfo Model:**
-```json
-{
-  "userName": "octocat",
-  "displayName": "The Octocat",
-  "avatar": "https://github.com/images/error/octocat_happy.gif",
-  "geoLocation": "San Francisco",
-  "email": "octocat@github.com",
-  "url": "https://api.github.com/users/octocat",
-  "createdAt": "Tue, 25 Jan 2011 18:44:36 GMT",
-  "repositories": [...]
-}
-```
-
-**GitHubRepository Model:**
-```json
-{
-  "name": "Hello-World",
-  "url": "https://api.github.com/repos/octocat/Hello-World"
-}
-```
-
-### Benefits of Swagger Integration
-
-🎨 **Beautiful Documentation** - Professional, interactive UI
-📖 **Auto-Generated** - Keeps docs in sync with code
-🔍 **Discoverable** - Easy to explore API capabilities
-🧪 **Testable** - Test endpoints directly in docs
-👥 **Developer-Friendly** - Lower barrier to integration
-📱 **Mobile-Responsive** - Works on all devices
 
 ## 🧪 Testing
 
@@ -459,18 +419,7 @@ http://localhost:8080/v3/api-docs.yaml
 
 ### Test Coverage
 
-The project includes **8 comprehensive test files** with unit, integration, and edge case coverage:
-
-| Test File | Type | Coverage |
-|-----------|------|----------|
-| **JonathanKleckerBranchServiceApplicationTests** | Integration | Spring context loading |
-| **GitInfoControllerIntegrationTest** | Integration | HTTP endpoints with MockMvc |
-| **GitInfoControllerUnitTest** | Unit | Username validation patterns |
-| **GitHubInfoTest** | Unit | Entity model & constructors |
-| **GitHubRepositoryTest** | Unit | Repository model |
-| **GitHubInfoMapperTest** | Unit | JSON mapping & transformation |
-| **GitHubServiceTest** | Integration | GitHub API integration |
-| **GitHubServiceExceptionTest** | Unit | Exception handling |
+Tests cover all layers: unit tests for validation/mapping/entities, integration tests for controllers and GitHub API calls.
 
 ### Test Results
 
@@ -500,27 +449,13 @@ This project maintains high code quality standards while being pragmatic about r
 - **Proper Naming Conventions**: Follows Java standards (camelCase, lowercase packages)
 - **Exception Handling**: Custom exceptions with HTTP status propagation
 
-### PMD Rule Customization Strategy
+### PMD Rule Customization
 
-The project uses a pragmatic approach to PMD rule enforcement:
-
-**Rules Suppressed in ruleset (`config/pmd-ruleset.xml`):**
-- `AssertionInTest`: Integration tests have implicit assertions (MockMvc `.andExpect()` throws on failure; Spring context load failure throws exception)
-- `UnnecessaryAssertionInTest`: Redundant `assertTrue(true)` statements in integration tests are unnecessary
-- `TooManyMethods`: Test classes should have many focused test methods (one per scenario)
-- `DuplicateStringLiteral`: Test data constants intentionally reuse values for clarity
-
-**Method-level Suppressions (`@SuppressWarnings("PMD")`):**
-- Spring Boot context tests (no explicit assertion needed)
-- MockMvc integration tests (assertions are implicit in `.andExpect()` calls)
-- Tests with logically-related multiple assertions (e.g., `assertThrows()` + `assertEquals()` for exception status)
-
-**Philosophy:**
-- ✅ Fix real quality issues in production code
-- ✅ Suppress unreasonable violations in test code
-- ✅ Document why each rule is suppressed
-- ✅ Follow Java and Spring Boot best practices
-- ✅ Use both ruleset and annotation-based suppressions as appropriate
+This project uses a pragmatic approach to PMD:
+- Focuses on real issues in production code
+- Suppresses or customizes rules that are not relevant or practical for test code
+- Documents any major suppressions or customizations in the codebase or ruleset
+- Follows Java and Spring Boot best practices
 
 ### Running Code Quality Analysis
 
@@ -541,68 +476,17 @@ Generated reports are available at:
 - Main Code: `build/reports/pmd/main.html`
 - Test Code: `build/reports/pmd/test.html`
 
-### Code Quality Summary
-
-The codebase maintains excellent quality standards:
-- ✅ Package names converted to lowercase
-- ✅ Field names converted from snake_case to camelCase
-- ✅ All parameters marked as `final`
-- ✅ Private constructors for utility classes
-- ✅ Single exit points in methods
-- ✅ Proper serialization IDs for exceptions
-- ✅ Improved exception handling patterns
-- ✅ Comprehensive test coverage with assertion messages
-- ✅ Smart PMD ruleset with explicit suppressions for test code
-- ✅ @SuppressWarnings annotations for integration test assertions
 
 ## 📁 Project Structure
 
 ```
-JonathanKleckerBranchService/
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/jonathanklecherbranchservice/
-│   │   │   ├── JonathanKleckerBranchServiceApplication.java
-│   │   │   ├── controller/
-│   │   │   │   └── GitInfoController.java
-│   │   │   ├── entity/
-│   │   │   │   ├── GitHubInfo.java
-│   │   │   │   └── GitHubRepository.java
-│   │   │   ├── mapper/
-│   │   │   │   └── GitHubInfoMapper.java
-│   │   │   └── service/
-│   │   │       ├── GitHubService.java
-│   │   │       └── GitHubServiceException.java
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-│       └── java/com/example/jonathanklecherbranchservice/
-│           ├── JonathanKleckerBranchServiceApplicationTests.java
-│           ├── controller/ (3 test files)
-│           ├── entity/ (2 test files)
-│           ├── mapper/ (1 test file)
-│           └── service/ (2 test files)
-├── build.gradle
-├── settings.gradle
-├── gradlew
-├── gradlew.bat
-├── README.md
-└── config/
-    └── pmd-ruleset.xml
+src/main/java/com/example/jonathanklecherbranchservice/
+├── JonathanKleckerBranchServiceApplication.java  # Main entry point
+├── controller/      # REST endpoints
+├── service/         # Business logic & GitHub API calls
+├── mapper/          # JSON transformation
+└── entity/          # Domain models
 ```
-
-### Key Files Explained
-
-| File | Purpose |
-|------|---------|
-| `build.gradle` | Gradle build configuration with dependencies and plugins |
-| `JonathanKleckerBranchServiceApplication.java` | Spring Boot application entry point |
-| `GitInfoController.java` | REST controller handling `/users/{userName}` endpoint |
-| `GitHubService.java` | Service layer calling GitHub API |
-| `GitHubInfoMapper.java` | Transforms GitHub API responses into domain objects |
-| `GitHubInfo.java` | Domain model for GitHub user |
-| `GitHubRepository.java` | Domain model for a repository |
-| `GitHubServiceException.java` | Custom exception for error handling |
 
 ## 🛠️ Development Workflow
 
@@ -617,15 +501,6 @@ JonathanKleckerBranchService/
 
 # Build with specific JVM options
 ./gradlew build -Dorg.gradle.jvmargs="-Xmx2g"
-```
-
-### Running Locally
-
-```bash
-# Start the development server
-./gradlew bootRun
-
-# The server starts on http://localhost:8080
 ```
 
 ### Making Changes
@@ -646,19 +521,6 @@ JonathanKleckerBranchService/
 
 ---
 
-## 🌟 Why This Project?
-
-- **Clean, layered architecture**: Clear separation of controller, service, mapper, and model layers.
-- **Comprehensive error handling**: Custom exceptions, HTTP status propagation, and user-friendly error messages.
-- **Robust validation**: Strict username validation prevents unnecessary API calls and ensures reliability.
-- **Intelligent caching**: Returns cached data on API failure, improving user experience.
-- **Code quality**: Passes SpotBugs and PMD with zero critical issues; all code is well-documented and tested.
-- **Extensive test coverage**: Unit, integration, and edge-case tests for all major components.
-- **Easy to run and extend**: Simple build/run/test workflow, clear documentation, and modular design.
-
-This project demonstrates best practices for building maintainable, production-ready REST APIs in Java with Spring Boot.
-
----
 
 ## 🐛 Troubleshooting
 
@@ -768,77 +630,9 @@ Key settings in `build.gradle`:
 | SpotBugs | Bug detection |
 | PMD | Code quality analysis |
 
-## 🤝 Contributing
-
-When contributing to this project:
-
-1. Follow the existing code style (see code quality checks)
-2. Add tests for new features
-3. Run `./gradlew codeQuality` before pushing
-4. Ensure all tests pass: `./gradlew test`
-5. Update this README if adding new endpoints or features
-
-## ⚠️ Troubleshooting
-
-### Common Issues and Solutions
-
-**Issue: "Cannot find module" when running tests**
-```
-Solution: Run ./gradlew clean build to rebuild the project
-```
-
-**Issue: Tests failing with "GitHub API connection refused"**
-```
-Solution: Check your internet connection and GitHub API availability
-Tests use the real GitHub API, so network connectivity is required
-```
-
-**Issue: PMD reports violations after code changes**
-```
-Solution: Run ./gradlew pmdMain to see detailed PMD reports
-Check config/pmd-ruleset.xml for suppression rules
-Review the Code Quality section of this README
-```
-
-**Issue: SpotBugs findings in generated code**
-```
-Solution: Run ./gradlew spotbugsMain to generate reports
-Check build/reports/spotbugs/main.html for details
-Most findings are informational and can be reviewed
-```
-
-**Issue: "Port already in use" when running the application**
-```
-Solution: Change the port in application.properties:
-server.port=8081
-
-Or specify on command line:
-./gradlew bootRun --args='--server.port=8081'
-```
-
-**Issue: JSON parsing errors from GitHub API**
-```
-Solution: Ensure the GitHub API is returning valid JSON
-Check your API token if using authenticated requests
-Review GitHubInfoMapper for transformation logic
-```
-
-## 📄 License
-
-This project is provided as-is for educational and demonstration purposes.
-
-## 📞 Support
-
-For questions or issues:
-1. Review the [Troubleshooting](#-troubleshooting) section
-2. Check test files for usage examples
-3. Review Spring Boot and GitHub API documentation
-4. Examine generated code quality reports
 
 ---
 
-**Last Updated**: December 2025
 **Version**: 0.0.1-SNAPSHOT
 **Java Version**: 21
 **Spring Boot**: 4.0.1
-
